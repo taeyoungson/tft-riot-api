@@ -6,6 +6,7 @@ from riot import platform_and_region
 from riot import utils
 from riot import objects
 from loguru import logger
+from typing import Literal
 
 class RiotApiClient:
     def __init__(self, api_key: str, platform_or_region: platform_and_region.Platform | platform_and_region.Region):
@@ -33,7 +34,11 @@ class TFTApiClient(RiotApiClient):
         super().__init__(**kwargs)
         self._query_type = "tft"
 
-    def get_challenger_data(self, match_type: str, version: str) -> objects.LeagueListDTO:
+    def get_challenger_data(
+        self,
+        match_type: Literal["league", "match", "status", "summoner"],
+        version: Literal["v1"],
+    ) -> objects.LeagueListDTO:
         response = utils.get(
             url=f"{self._api_base}/{self._query_type}/{match_type}/{version}/challenger/",
             headers=self._headers,
