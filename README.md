@@ -15,3 +15,5 @@ Example output is following:
     Queue: RANKED_TFT
     Entries: 300 number of entries.
 ```
+
+Document references [here](https://developer.riotgames.com/)
