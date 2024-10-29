@@ -1,5 +1,5 @@
 from __future__ import annotations
-import ast
+
 import dataclasses
 
 
@@ -18,6 +18,61 @@ class MiniSeriesDTO:
             target=int(d["target"]),
             wins=int(d["wins"]),
         )
+
+
+@dataclasses.dataclass
+class LeagueEntryDTO:
+    puuid: str
+    league_id: str
+    summoner_id: str
+    queue_type: str
+    tier: str
+    rank: str
+    league_points: int
+    wins: int
+    losses: int
+    hot_streak: bool
+    veteran: bool
+    fresh_blood: bool
+    inactive: bool
+    mini_series: list[MiniSeriesDTO]
+
+    @classmethod
+    def from_dict(cls, d: dict[str, str]) -> LeagueEntryDTO:
+        return cls(
+            puuid=d["puuid"],
+            league_id=d["leagueId"],
+            summoner_id=d["summonerId"],
+            queue_type=d["queueType"],
+            tier=d["tier"],
+            rank=d["rank"],
+            league_points=int(d["leaguePoints"]),
+            wins=int(d["wins"]),
+            losses=int(d["losses"]),
+            hot_streak=bool(d["hotStreak"]),
+            veteran=bool(d["veteran"]),
+            fresh_blood=bool(d["freshBlood"]),
+            inactive=bool(d["inactive"]),
+            mini_series=[MiniSeriesDTO.from_dict(m_s) for m_s in d.get("miniSeries", [])],
+        )
+
+    def __repr__(self):
+        return f"""
+            PUUID: {self.puuid}
+            League ID: {self.league_id}
+            Summon ID: {self.summoner_id}
+            Queue Type: {self.queue_type}
+            Tier: {self.tier}
+            Rank: {self.rank}
+            League Points: {self.league_points}
+            Wins: {self.wins}
+            Losses: {self.losses}
+            Hot Streak: {self.hot_streak}
+            Veteran: {self.veteran}
+            Fresh Blood: {self.fresh_blood}
+            Inactive: {self.inactive}
+            Mini Series: {len(self.mini_series)} number of mini-serires.
+        """
 
 
 @dataclasses.dataclass
@@ -61,6 +116,7 @@ class LeagueItemDTO:
             Summer ID: {self.summoner_id}
             miniseries: {len(self.mini_series)} number of miniseries.
         """
+
 
 @dataclasses.dataclass
 class LeagueListDTO:
