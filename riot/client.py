@@ -32,7 +32,12 @@ class RiotApiClient:
         }
 
     def _request(
-        self, method: str, url: str, params: dict | None = None, timeout: int = _DEFAULT_REQUEST_TIMEOUT, **kwargs
+        self,
+        method: str,
+        url: str,
+        params: dict | None = None,
+        timeout: int = _DEFAULT_REQUEST_TIMEOUT,
+        **kwargs,
     ) -> dict[str, Any]:
         try:
             response = requests.request(method=method, url=url, params=params, timeout=timeout, **kwargs)
