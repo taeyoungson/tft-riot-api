@@ -5,6 +5,7 @@ from loguru import logger
 import requests
 from requests.exceptions import HTTPError
 
+from riot import errors
 from riot import utils
 
 _DEFAULT_REQUEST_TIMEOUT = 30
@@ -13,33 +14,6 @@ _DEFAULT_REQUEST_TIMEOUT = 30
 class RiotApiClient:
     def __init__(self, api_key: str):
         self._api_key = api_key
-
-    def _print_error_msg(self, error_code: int) -> str:
-        match error_code:
-            case 400:
-                return "Bad request"
-            case 401:
-                return "Unauthorized"
-            case 403:
-                return "Forbidden"
-            case 404:
-                return "Not found"
-            case 405:
-                return "Method Not Allowed"
-            case 415:
-                return "Unsupported Media Type"
-            case 429:
-                return "Rate Limit Exceeded"
-            case 500:
-                return "Internal Server Error"
-            case 502:
-                return "Bad Gateway"
-            case 503:
-                return "Service unavailable"
-            case 504:
-                return "Gateway Timeout"
-            case _:
-                return "Unknown Error"
 
     @property
     def _api_base(self) -> str:
@@ -62,7 +36,7 @@ class RiotApiClient:
             response = requests.request(method=method, url=url, params=params, timeout=timeout, **kwargs)
             response.raise_for_status()
         except HTTPError as err:
-            logger.error(self._print_error_msg(response.status_code))
+            logger.error(errors.err_code_to_err_msg(response.status_code))
             raise err
 
         return json.loads(response.text)

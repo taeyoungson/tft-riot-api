@@ -60,7 +60,7 @@ class LeagueEntryDTO:
         return f"""
             PUUID: {self.puuid}
             League ID: {self.league_id}
-            Summon ID: {self.summoner_id}
+            Summoner ID: {self.summoner_id}
             Queue Type: {self.queue_type}
             Tier: {self.tier}
             Rank: {self.rank}
@@ -144,3 +144,138 @@ class LeagueListDTO:
             Queue: {self.queue}
             Entries: {len(self.entries)} number of entries.
         """
+
+
+@dataclasses.dataclass
+class MetadataDTO:
+    data_version: str
+    match_id: str
+    participants_puuids: list[str]
+
+    @classmethod
+    def from_dict(cls, d: dict[str, str | list[str]]) -> MetadataDTO:
+        return cls(
+            data_version=d["data_version"],
+            match_id=d["match_id"],
+            participants_puuids=d["participants"],
+        )
+
+
+@dataclasses.dataclass
+class CompanionDTO:
+    pass
+
+    @classmethod
+    def from_dict(cls, d: dict[str, str]) -> CompanionDTO:
+        pass
+
+
+@dataclasses.dataclass
+class TraitDTO:
+    name: str
+    num_units: int
+    style: int
+    tier_current: int
+    tier_total: int
+
+    @classmethod
+    def from_dict(cls, d: dict[str, str]) -> TraitDTO:
+        return cls(
+            name=d["name"],
+            num_units=int(d["num_units"]),
+            style=int(d["style"]),
+            tier_current=int(d["tier_current"]),
+            tier_total=int(d["tier_total"]),
+        )
+
+
+@dataclasses.dataclass
+class UnitDTO:
+    items: list[int]
+    character_ids: str
+    chosen: str | None
+    name: str
+    rarity: int
+    tier: int
+
+    @classmethod
+    def from_dict(cls, d: dict[str, str, list]) -> UnitDTO:
+        return cls(
+            items=d["items"],
+            character_ids=d["character_ids"],
+            chosen=d.get("chosen", None),
+            name=d["name"],
+            rarity=int(d["rarity"]),
+            tier=int(d["tier"]),
+        )
+
+
+@dataclasses.dataclass
+class ParticipantDTO:
+    companion: CompanionDTO
+    gold_left: int
+    last_round: int
+    level: int
+    placement: int
+    players_eliminated: int
+    puuid: str
+    riot_id_game_name: str
+    riot_id_tag_line: str
+    time_eliminated: float
+    total_damage_to_players: int
+    traits: list[TraitDTO]
+    units: list[UnitDTO]
+
+    @classmethod
+    def from_dict(cls, d: dict[str, str | dict]) -> ParticipantDTO:
+        return cls(
+            companion=CompanionDTO.from_dict(d["companion"]),
+            gold_left=int(d["gold_left"]),
+            last_round=int(d["last_round"]),
+            level=int(d["level"]),
+            placement=int(d["placement"]),
+            players_eliminated=int(d["players_eliminated"]),
+            puuid=d["puuid"],
+            riot_id_game_name=d["riotIdGameName"],
+            riot_id_tag_line=d["riotIdTagLine"],
+            time_eliminated=float(d["time_eliminated"]),
+            total_damage_to_players=int(d["total_damage_to_players"]),
+            traits=[TraitDTO.from_dict(t) for t in d["traits"]],
+            units=[UnitDTO.from_dict(u) for u in d["units"]],
+        )
+
+
+@dataclasses.dataclass
+class InfoDTO:
+    game_datetime: float
+    game_length: float
+    game_variation: str
+    game_version: str
+    participants: list[ParticipantDTO]
+    queue_id: int
+    tft_set_number: int
+
+    @classmethod
+    def from_dict(cls, d: dict[str, str | dict]) -> InfoDTO:
+        return cls(
+            game_datetime=float(d["game_datetime"]),
+            game_length=float(d["game_length"]),
+            game_variation=d["game_variation"],
+            game_version=d["game_version"],
+            participants=[ParticipantDTO.from_dict(p) for p in d["participants"]],
+            queue_id=int(d["queue_id"]),
+            tft_set_number=int(d["tft_set_number"]),
+        )
+
+
+@dataclasses.dataclass
+class MatchDTO:
+    metadata: MetadataDTO
+    info: InfoDTO
+
+    @classmethod
+    def from_dict(cls, d: dict[str, str | dict]) -> MatchDTO:
+        return cls(
+            metadata=MetadataDTO.from_dict(d["metadata"]),
+            info=InfoDTO.from_dict(d["info"]),
+        )

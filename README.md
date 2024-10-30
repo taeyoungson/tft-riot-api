@@ -7,7 +7,7 @@ python example.py
 ```
 
 Example output is following:
-[.pylintrc](.pylintrc)
+
 ```bash
 Example Output
     - LeagueList DTO
@@ -18,6 +18,7 @@ Example Output
     Entries: 300 number of entries.
 
     =============================
+    
     - Summoner IDs
         jcO5Tkhu_Y82HRt8AOTSiCPC2QN204S7bSA39rsHdUYU3HTFid0hF5HxZA
         ...
@@ -37,7 +38,11 @@ Example Output
     Veteran: True
     Fresh Blood: False
     Inactive: False
-    Mini Series: 0 number of mini-serires.
+    Mini Series: 0 number of mini-series.
+    ==============================
+    
+    - Match Ids
+    - Match Datas
     ...
 ```
 
