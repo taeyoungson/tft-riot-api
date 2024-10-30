@@ -1,19 +1,22 @@
-import json
+import datetime
 import os
 
 import dotenv
 from loguru import logger
 
 from riot import client
-from riot import objects
 from riot import platform_and_region
-from riot import utils
+from riot.utils import types
 
 _DEFAULT_SEARCH_CONFIG = {
-    "game_type": utils.GameType.TFT,
-    "query_type": utils.QueryType.LEAGUE,
-    "version_type": utils.VersionType.V1,
-    "platform_or_region": platform_and_region.Platform.KR,
+    "game_type": types.GameType.TFT,
+    "query_type": types.QueryType.LEAGUE,
+    "version_type": types.VersionType.V1,
+    "region": platform_and_region.Region.ASIA,
+    "platform": platform_and_region.Platform.KR,
+    "start": 0,
+    "start_time": int(datetime.datetime(2024, 6, 1, 0, 0).timestamp()),
+    "end_time": int(datetime.datetime(2024, 10, 30, 0, 0).timestamp()),
 }
 
 
@@ -24,46 +27,23 @@ def main():
 
     riot_api_client = client.RiotApiClient(api_key=os.getenv("RIOT_API_KEY"))
 
-    challenger_league_data = riot_api_client.fetch(
-        **_DEFAULT_SEARCH_CONFIG, extra_url=utils.TierType.CHALLENGER, params={"queue": "RANKED_TFT"}
+    challenger_league_data = riot_api_client.get_league_data_by_tier(
+        tier=types.TierType.CHALLENGER, **_DEFAULT_SEARCH_CONFIG
     )
-    challenger_league_data = objects.LeagueListDTO.from_dict(challenger_league_data)
-    summoner_ids = [e.summoner_id for e in challenger_league_data.entries]
+    # summoner_ids = [e.summoner_id if not e.inactive for e in challenger_league_data.entries]
 
-    summoner_data = []
+    summoner_ids = []
+    for entry in challenger_league_data.entries:
+        if not entry.inactive:
+            summoner_ids.append(entry.summoner_id)
+
     # TODO(ty.son) fix rate limit exceeding
-    for summoner_id in summoner_ids:
-        summoner_datum = riot_api_client.fetch(
-            **_DEFAULT_SEARCH_CONFIG,
-            extra_url=f"entries/by-summoner/{summoner_id}",
-        )
-        summoner_data.append(summoner_datum)
-        break
+    summoner_data = riot_api_client.get_summoner_data_by_summoner_ids(summoner_ids[:5], **_DEFAULT_SEARCH_CONFIG)
+    puuids = [d.puuid for d in summoner_data]
+    match_ids = riot_api_client.get_match_ids_by_puuids(puuids, **_DEFAULT_SEARCH_CONFIG)
 
-    summoner_data = [objects.LeagueEntryDTO.from_dict(s[0]) for s in summoner_data]
-
-    # get match data
-    match_search_config = _DEFAULT_SEARCH_CONFIG
-    match_search_config.update(
-        {
-            "query_type": utils.QueryType.MATCH,
-            "platform_or_region": platform_and_region.Region.ASIA,
-        }
-    )
-
-    summoner_ids_to_match_ids = {}
-
-    for summoner_datum in summoner_data:
-        match_ids = riot_api_client.fetch(
-            **match_search_config, extra_url=f"matches/by-puuid/{summoner_datum.puuid}/ids"
-        )
-        summoner_ids_to_match_ids[summoner_datum.summoner_id] = match_ids
-
-    match_data = []
-    for match_id in match_ids:
-        data = riot_api_client.fetch(**match_search_config, extra_url=f"matches/{match_id}")
-        match_data.append(data)
-        break
+    # check for first summoner
+    match_data = riot_api_client.get_match_data_by_match_ids(match_ids[0], **_DEFAULT_SEARCH_CONFIG)
 
     logger.info(
         f"""
@@ -80,10 +60,10 @@ def main():
                 ...
             =============================
             - Match Ids
-                {summoner_ids_to_match_ids[summoner_data[0].summoner_id]}
+                {match_ids[0]}
             =============================
             - Match Data
-                {json.dumps(match_data[0], indent=2)}
+                {match_data[0]}
         """
     )
 

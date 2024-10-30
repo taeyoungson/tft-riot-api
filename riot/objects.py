@@ -192,7 +192,8 @@ class TraitDTO:
 @dataclasses.dataclass
 class UnitDTO:
     items: list[int]
-    character_ids: str
+    item_names: list[str]
+    character_id: str
     chosen: str | None
     name: str
     rarity: int
@@ -201,8 +202,9 @@ class UnitDTO:
     @classmethod
     def from_dict(cls, d: dict[str, str, list]) -> UnitDTO:
         return cls(
-            items=d["items"],
-            character_ids=d["character_ids"],
+            items=d.get("items", []),
+            item_names=d["itemNames"],
+            character_id=d["character_id"],
             chosen=d.get("chosen", None),
             name=d["name"],
             rarity=int(d["rarity"]),
@@ -212,6 +214,7 @@ class UnitDTO:
 
 @dataclasses.dataclass
 class ParticipantDTO:
+    augments: list[str]
     companion: CompanionDTO
     gold_left: int
     last_round: int
@@ -219,16 +222,17 @@ class ParticipantDTO:
     placement: int
     players_eliminated: int
     puuid: str
-    riot_id_game_name: str
-    riot_id_tag_line: str
+    riot_id_game_name: str | None
+    riot_id_tag_line: str | None
     time_eliminated: float
     total_damage_to_players: int
     traits: list[TraitDTO]
     units: list[UnitDTO]
 
     @classmethod
-    def from_dict(cls, d: dict[str, str | dict]) -> ParticipantDTO:
+    def from_dict(cls, d: dict[str, str | dict | list]) -> ParticipantDTO:
         return cls(
+            augments=d["augments"],
             companion=CompanionDTO.from_dict(d["companion"]),
             gold_left=int(d["gold_left"]),
             last_round=int(d["last_round"]),
@@ -236,8 +240,8 @@ class ParticipantDTO:
             placement=int(d["placement"]),
             players_eliminated=int(d["players_eliminated"]),
             puuid=d["puuid"],
-            riot_id_game_name=d["riotIdGameName"],
-            riot_id_tag_line=d["riotIdTagLine"],
+            riot_id_game_name=d.get("riotIdGameName", None),
+            riot_id_tag_line=d.get("riotIdTagline", None),
             time_eliminated=float(d["time_eliminated"]),
             total_damage_to_players=int(d["total_damage_to_players"]),
             traits=[TraitDTO.from_dict(t) for t in d["traits"]],
@@ -249,8 +253,8 @@ class ParticipantDTO:
 class InfoDTO:
     game_datetime: float
     game_length: float
-    game_variation: str
     game_version: str
+    game_variation: str | None
     participants: list[ParticipantDTO]
     queue_id: int
     tft_set_number: int
@@ -260,7 +264,7 @@ class InfoDTO:
         return cls(
             game_datetime=float(d["game_datetime"]),
             game_length=float(d["game_length"]),
-            game_variation=d["game_variation"],
+            game_variation=d.get("game_variation", None),
             game_version=d["game_version"],
             participants=[ParticipantDTO.from_dict(p) for p in d["participants"]],
             queue_id=int(d["queue_id"]),
