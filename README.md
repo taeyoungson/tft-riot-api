@@ -25,6 +25,8 @@ To test current state of code,
 
 ```bash
 python example.py
+--tier challenger
+--start_date 2024-10-31
 ```
 
 Example output is following:

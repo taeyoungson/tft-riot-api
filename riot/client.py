@@ -4,6 +4,7 @@ from typing import Any
 from loguru import logger
 from requests.exceptions import HTTPError
 import requests_ratelimiter
+import tqdm
 
 from riot import errors
 from riot import objects
@@ -11,8 +12,8 @@ from riot import platform_and_region
 from riot.utils import types
 
 _DEFAULT_REQUEST_TIMEOUT = 30
-_RATE_LIMIT_PER_SECOND = 10
-_RATE_LIMIT_PER_MINUTE = 30
+_RATE_LIMIT_PER_SECOND = 20
+_RATE_LIMIT_PER_MINUTE = 45
 
 
 class RiotApiClient:
@@ -46,7 +47,6 @@ class RiotApiClient:
         **kwargs,
     ) -> dict[str, Any]:
         try:
-            # response = requests.request(method=method, url=url, params=params, timeout=timeout, **kwargs)
             response = self._session.request(method=method, url=url, params=params, timeout=timeout, **kwargs)
             response.raise_for_status()
         except HTTPError as err:
@@ -195,7 +195,11 @@ class RiotApiClient:
         return [self._get_match_ids_by_puuid(pid, **kwargs) for pid in puuids]
 
     def get_summoner_data_by_summoner_ids(self, summoner_ids: list[str], **kwargs) -> list[objects.LeagueEntryDTO]:
-        return [self._get_summoner_data_by_summoner_id(summoner_id, **kwargs) for summoner_id in summoner_ids]
+        # return [self._get_summoner_data_by_summoner_id(summoner_id, **kwargs) for summoner_id in summoner_ids]
+        summoner_data = []
+        for summoner_id in tqdm.tqdm(summoner_ids, desc="Getting summoner data..."):
+            summoner_data.append(self._get_summoner_data_by_summoner_id(summoner_id, **kwargs))
+        return summoner_data
 
     def _get_match_data_by_match_id(
         self,
@@ -216,4 +220,7 @@ class RiotApiClient:
         )
 
     def get_match_data_by_match_ids(self, match_ids: list[str], **kwargs) -> list[objects.MatchDTO]:
-        return [self._get_match_data_by_match_id(m_id, **kwargs) for m_id in match_ids]
+        match_data = []
+        for match_id in tqdm.tqdm(match_ids, desc="Getting match data..."):
+            match_data.append(self._get_match_data_by_match_id(match_id, **kwargs))
+        return match_data
