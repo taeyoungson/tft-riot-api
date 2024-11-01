@@ -31,10 +31,6 @@ class RiotApiClient:
     @property
     def _headers(self) -> dict[str, str]:
         return {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",  # pylint: disable=line-too-long
-            "Accept-Language": "en-US,en;q=0.9,ko;q=0.8",
-            "Accept-Charset": "application/x-www-form-urlencoded; charset=UTF-8",
-            "Origin": "https://developer.riotgames.com",
             "X-Riot-Token": self._api_key,
         }
 

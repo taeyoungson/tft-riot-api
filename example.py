@@ -56,8 +56,8 @@ def main(_):
 
     # 0. Log some info
     logger.info(
-        f"Scraping tft data for tier: {FLAGS.tier.upper()}:{FLAGS.division}"
-        f"for {FLAGS.start_date} ~ {FLAGS.end_date}"
+        f"Scraping tft data for tier: {FLAGS.tier.upper()} {FLAGS.division}"
+        f" for {FLAGS.start_date} ~ {FLAGS.end_date}"
     )
 
     # 1. Initialize client
