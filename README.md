@@ -15,7 +15,7 @@ poetry install
 ```
 You are set!
 
-3. If you added another python package, add it to pyproject.toml under [tool.poetry.dependencies]. and rewrite lock using
+If you added another python package, add it to pyproject.toml under [tool.poetry.dependencies]. and regenerate lock file using
 ```bash
 poetry lock
 ```
