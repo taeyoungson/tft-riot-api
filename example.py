@@ -1,12 +1,22 @@
 import datetime
 import os
 
+from absl import app
+from absl import flags
 import dotenv
 from loguru import logger
+import tqdm
 
 from riot import client
 from riot import platform_and_region
 from riot.utils import types
+
+flags.DEFINE_string("tier", None, "[IRON, BRONZE, SILVER, GOLD, ...]")
+flags.DEFINE_string(
+    "division", types.DivisionType.I, "Inner rank inside tier, node that (grand)master, challenger has only one tier"
+)
+
+FLAGS = flags.FLAGS
 
 _DEFAULT_SEARCH_CONFIG = {
     "game_type": types.GameType.TFT,
@@ -21,25 +31,28 @@ _DEFAULT_SEARCH_CONFIG = {
 
 
 # TODO(ty.son): temporary usage example
-def main():
+def main(_):
     # TODO(ty.son): temporally get api key from .env
     dotenv.load_dotenv("./riot/.env")
 
     # 1. Initialize client
     riot_api_client = client.RiotApiClient(api_key=os.getenv("RIOT_API_KEY"))
 
-    # 2. Get challenger-tier league data.
-    challenger_league_data = riot_api_client.get_league_data_by_tier(
-        tier=types.TierType.CHALLENGER, **_DEFAULT_SEARCH_CONFIG
+    # 2. Get challenger-tier league entries.
+    logger.info("Getting user entries...")
+    tier_entries = riot_api_client.get_league_entries_by_tier(
+        tier=FLAGS.tier, division=FLAGS.division, **_DEFAULT_SEARCH_CONFIG
     )
 
-    # 3. Collect summoner ids of active challngers
+    # 3. Collect summoner ids of active users
     summoner_ids = []
-    for entry in challenger_league_data.entries:
+    logger.info("Getting summoner Ids...")
+    for entry in tqdm.tqdm(tier_entries):
         if not entry.inactive:
             summoner_ids.append(entry.summoner_id)
 
     # 4. Get summoner data by summoner ids
+    logger.info("Getting summoner data...")
     summoner_data = riot_api_client.get_summoner_data_by_summoner_ids(summoner_ids, **_DEFAULT_SEARCH_CONFIG)
 
     # 5. Collect puuids from summoner data
@@ -54,8 +67,8 @@ def main():
     logger.info(
         f"""
             Example Output
-            - LeagueList DTO
-                {challenger_league_data}
+            - Tier Entries
+                {tier_entries}
             =============================
             - Summoner IDs
                 {summoner_ids[0]}
@@ -75,4 +88,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    flags.mark_flags_as_required(["tier"])
+    app.run(main)

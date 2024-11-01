@@ -21,3 +21,17 @@ class TierType(enum.StrEnum):
     CHALLENGER = "challenger"
     GRANDMASTER = "grandmaster"
     MASTER = "master"
+    DIAMOND = "DIAMOND"
+    EMERALD = "EMERALD"
+    PLATINUM = "PLATINUM"
+    GOLD = "GOLD"
+    SILVER = "SILVER"
+    BRONZE = "BRONZE"
+    IRON = "IRON"
+
+
+class DivisionType(enum.StrEnum):
+    I = "I"
+    II = "II"
+    III = "III"
+    IV = "IV"

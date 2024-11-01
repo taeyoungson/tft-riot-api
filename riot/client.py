@@ -11,8 +11,8 @@ from riot import platform_and_region
 from riot.utils import types
 
 _DEFAULT_REQUEST_TIMEOUT = 30
-_RATE_LIMIT_PER_SECOND = 20
-_RATE_LIMIT_PER_MINUTE = 50
+_RATE_LIMIT_PER_SECOND = 10
+_RATE_LIMIT_PER_MINUTE = 30
 
 
 class RiotApiClient:
@@ -114,25 +114,39 @@ class RiotApiClient:
 
         return self._get(url=url, params=params, headers=self._headers)
 
-    def get_league_data_by_tier(
+    def get_league_entries_by_tier(
         self,
         tier: types.TierType,
         game_type: types.GameType,
         version_type: types.VersionType,
         platform: platform_and_region.Platform,
+        division: types.DivisionType = types.DivisionType.I,
         queue: str = "RANKED_TFT",
+        page: int = 1,
         **kwargs,  # pylint: disable=unused-argument
-    ) -> objects.LeagueListDTO:
-        return objects.LeagueListDTO.from_dict(
-            self._fetch(
+    ) -> list[objects.LeagueEntryDTO | objects.LeagueItemDTO]:
+        if tier.lower() in [types.TierType.CHALLENGER, types.TierType.GRANDMASTER, types.TierType.MASTER]:
+            return objects.LeagueListDTO.from_dict(
+                self._fetch(
+                    game_type=game_type,
+                    query_type=types.QueryType.LEAGUE,
+                    version_type=version_type,
+                    platform=platform,
+                    extra_url=tier.lower(),
+                    params={"queue": queue},
+                )
+            ).entries
+
+        else:
+            entries = self._fetch(
                 game_type=game_type,
                 query_type=types.QueryType.LEAGUE,
                 version_type=version_type,
                 platform=platform,
-                extra_url=tier,
-                params={"queue": queue},
+                extra_url=f"entries/{tier.upper()}/{division}",
+                params={"queue": queue, "page": page},
             )
-        )
+            return [objects.LeagueEntryDTO.from_dict(e) for e in entries]
 
     def _get_summoner_data_by_summoner_id(
         self,
@@ -149,11 +163,9 @@ class RiotApiClient:
             platform=platform,
             extra_url=f"entries/by-summoner/{summoner_id}",
         )
+        tft_rank_entries = filter(lambda x: x["queueType"] == "RANKED_TFT", entry)
 
-        if not len(entry) == 1:
-            logger.warning(f"Something wrong! len(entries) is not 1 but {len(entry)} for id: {summoner_id}")
-
-        return objects.LeagueEntryDTO.from_dict(entry[0])
+        return objects.LeagueEntryDTO.from_dict(list(tft_rank_entries)[0])
 
     def _get_match_ids_by_puuid(
         self,
@@ -165,7 +177,7 @@ class RiotApiClient:
         start_time: int,
         end_time: int,
         **kwargs,  # pylint: disable=unused-argument
-    ) -> list[int]:
+    ) -> list[str]:
         return self._fetch(
             game_type=game_type,
             query_type=types.QueryType.MATCH,
@@ -179,7 +191,7 @@ class RiotApiClient:
         self,
         puuids: list[str],
         **kwargs,
-    ) -> list[list[int]]:
+    ) -> list[list[str]]:
         return [self._get_match_ids_by_puuid(pid, **kwargs) for pid in puuids]
 
     def get_summoner_data_by_summoner_ids(self, summoner_ids: list[str], **kwargs) -> list[objects.LeagueEntryDTO]:
