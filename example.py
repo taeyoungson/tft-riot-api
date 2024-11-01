@@ -40,7 +40,7 @@ def main():
             summoner_ids.append(entry.summoner_id)
 
     # 4. Get summoner data by summoner ids
-    summoner_data = riot_api_client.get_summoner_data_by_summoner_ids(summoner_ids[:5], **_DEFAULT_SEARCH_CONFIG)
+    summoner_data = riot_api_client.get_summoner_data_by_summoner_ids(summoner_ids, **_DEFAULT_SEARCH_CONFIG)
 
     # 5. Collect puuids from summoner data
     puuids = [d.puuid for d in summoner_data]

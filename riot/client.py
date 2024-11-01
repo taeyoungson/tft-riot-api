@@ -2,8 +2,8 @@ import json
 from typing import Any
 
 from loguru import logger
-import requests
 from requests.exceptions import HTTPError
+import requests_ratelimiter
 
 from riot import errors
 from riot import objects
@@ -11,11 +11,17 @@ from riot import platform_and_region
 from riot.utils import types
 
 _DEFAULT_REQUEST_TIMEOUT = 30
+_RATE_LIMIT_PER_SECOND = 20
+_RATE_LIMIT_PER_MINUTE = 50
 
 
 class RiotApiClient:
     def __init__(self, api_key: str):
         self._api_key = api_key
+        self._session = requests_ratelimiter.LimiterSession(
+            per_second=_RATE_LIMIT_PER_SECOND,
+            per_minute=_RATE_LIMIT_PER_MINUTE,
+        )
 
     @property
     def _api_base(self) -> str:
@@ -40,7 +46,8 @@ class RiotApiClient:
         **kwargs,
     ) -> dict[str, Any]:
         try:
-            response = requests.request(method=method, url=url, params=params, timeout=timeout, **kwargs)
+            # response = requests.request(method=method, url=url, params=params, timeout=timeout, **kwargs)
+            response = self._session.request(method=method, url=url, params=params, timeout=timeout, **kwargs)
             response.raise_for_status()
         except HTTPError as err:
             logger.error(errors.err_code_to_err_msg(response.status_code))
