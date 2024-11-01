@@ -1,5 +1,26 @@
-# Testing RIOT API
+# TFT Riot API
 
+
+## Setting up
+
+1. Install poetry
+```bash
+curl -sSL https://install.python-poetry.org | python3 -
+```
+
+2. In repository root, execute following
+```bash
+poetry shell
+poetry install
+```
+You are set!
+
+3. If you added another python package, add it to pyproject.toml under [tool.poetry.dependencies]. and rewrite lock using
+```bash
+poetry lock
+```
+
+## Running example script
 To test current state of code,
 
 ```bash
