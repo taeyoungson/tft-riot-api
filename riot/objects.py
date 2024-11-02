@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-import dataclasses
+import pydantic
 
 
-@dataclasses.dataclass
-class MiniSeriesDTO:
+class MiniSeriesDTO(pydantic.BaseModel):
     losses: int
     progress: str
     target: int
@@ -20,8 +19,7 @@ class MiniSeriesDTO:
         )
 
 
-@dataclasses.dataclass
-class LeagueEntryDTO:
+class LeagueEntryDTO(pydantic.BaseModel):
     puuid: str
     league_id: str
     summoner_id: str
@@ -75,8 +73,7 @@ class LeagueEntryDTO:
         """
 
 
-@dataclasses.dataclass
-class LeagueItemDTO:
+class LeagueItemDTO(pydantic.BaseModel):
     fresh_blood: bool
     wins: int
     mini_series: list[MiniSeriesDTO]
@@ -118,8 +115,7 @@ class LeagueItemDTO:
         """
 
 
-@dataclasses.dataclass
-class LeagueListDTO:
+class LeagueListDTO(pydantic.BaseModel):
     league_id: str
     entries: list[LeagueItemDTO]
     tier: str
@@ -146,8 +142,7 @@ class LeagueListDTO:
         """
 
 
-@dataclasses.dataclass
-class MetadataDTO:
+class MetadataDTO(pydantic.BaseModel):
     data_version: str
     match_id: str
     participants_puuids: list[str]
@@ -161,17 +156,7 @@ class MetadataDTO:
         )
 
 
-@dataclasses.dataclass
-class CompanionDTO:
-    pass
-
-    @classmethod
-    def from_dict(cls, d: dict[str, str]) -> CompanionDTO:
-        pass
-
-
-@dataclasses.dataclass
-class TraitDTO:
+class TraitDTO(pydantic.BaseModel):
     name: str
     num_units: int
     style: int
@@ -189,8 +174,7 @@ class TraitDTO:
         )
 
 
-@dataclasses.dataclass
-class UnitDTO:
+class UnitDTO(pydantic.BaseModel):
     items: list[int]
     item_names: list[str]
     character_id: str
@@ -212,10 +196,8 @@ class UnitDTO:
         )
 
 
-@dataclasses.dataclass
-class ParticipantDTO:
+class ParticipantDTO(pydantic.BaseModel):
     augments: list[str]
-    companion: CompanionDTO
     gold_left: int
     last_round: int
     level: int
@@ -233,7 +215,6 @@ class ParticipantDTO:
     def from_dict(cls, d: dict[str, str | dict | list]) -> ParticipantDTO:
         return cls(
             augments=d["augments"],
-            companion=CompanionDTO.from_dict(d["companion"]),
             gold_left=int(d["gold_left"]),
             last_round=int(d["last_round"]),
             level=int(d["level"]),
@@ -249,8 +230,7 @@ class ParticipantDTO:
         )
 
 
-@dataclasses.dataclass
-class InfoDTO:
+class InfoDTO(pydantic.BaseModel):
     game_datetime: float
     game_length: float
     game_version: str
@@ -272,8 +252,7 @@ class InfoDTO:
         )
 
 
-@dataclasses.dataclass
-class MatchDTO:
+class MatchDTO(pydantic.BaseModel):
     metadata: MetadataDTO
     info: InfoDTO
 
