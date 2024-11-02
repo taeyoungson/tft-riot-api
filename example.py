@@ -34,13 +34,12 @@ flags.DEFINE_string(
     datetime.datetime.now().strftime("%Y-%m-%d"),
     "datetime.date format, write in format YYYY-MM-DD",
 )
+flags.DEFINE_integer("count", 20, "number of match ids to fetch for single api call")
 
 FLAGS = flags.FLAGS
 
 
-# TODO(ty.son): temporary usage example
 def main(_):
-    # TODO(ty.son): temporally get api key from .env
     dotenv.load_dotenv("./riot/.env")
 
     default_search_config = {
@@ -52,6 +51,7 @@ def main(_):
         "start": 0,
         "start_time": int(datetime.datetime.fromisoformat(FLAGS.start_date).timestamp()),
         "end_time": int(datetime.datetime.fromisoformat(FLAGS.end_date).timestamp()),
+        "count": FLAGS.count,
     }
 
     # 0. Log some info

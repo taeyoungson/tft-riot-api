@@ -172,6 +172,7 @@ class RiotApiClient:
         start: int,
         start_time: int,
         end_time: int,
+        count: int,
         **kwargs,  # pylint: disable=unused-argument
     ) -> list[str]:
         return self._fetch(
@@ -180,7 +181,12 @@ class RiotApiClient:
             version_type=version_type,
             region=region,
             extra_url=f"matches/by-puuid/{puuid}/ids",
-            params={"start": start, "startTime": start_time, "endTime": end_time},
+            params={
+                "start": start,
+                "startTime": start_time,
+                "endTime": end_time,
+                "count": count,
+            },
         )
 
     def get_match_ids_by_puuids(
@@ -191,7 +197,6 @@ class RiotApiClient:
         return [self._get_match_ids_by_puuid(pid, **kwargs) for pid in puuids]
 
     def get_summoner_data_by_summoner_ids(self, summoner_ids: list[str], **kwargs) -> list[objects.LeagueEntryDTO]:
-        # return [self._get_summoner_data_by_summoner_id(summoner_id, **kwargs) for summoner_id in summoner_ids]
         summoner_data = []
         for summoner_id in tqdm.tqdm(summoner_ids, desc="Getting summoner data..."):
             summoner_data.append(self._get_summoner_data_by_summoner_id(summoner_id, **kwargs))
