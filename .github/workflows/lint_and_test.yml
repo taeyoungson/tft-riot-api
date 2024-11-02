@@ -27,5 +27,5 @@ jobs:
       env:
         RIOT_API_KEY: ${{ secrets.RIOT_API_KEY }}
       run: |
-        echo $RIOT_API_KEY >> ./riot/.env
+        echo $RIOT_API_KEY > ./riot/.env
         python -m unittest discover --pattern test_*.py --failfast -v
