@@ -17,7 +17,7 @@ from loguru import logger
 import tqdm
 
 from riot import client
-from riot import platform_and_region
+from riot.utils import search
 from riot.utils import types
 
 flags.DEFINE_string("tier", None, "[IRON, BRONZE, SILVER, GOLD, ...]")
@@ -42,17 +42,12 @@ FLAGS = flags.FLAGS
 def main(_):
     dotenv.load_dotenv("./riot/.env")
 
-    default_search_config = {
-        "game_type": types.GameType.TFT,
-        "query_type": types.QueryType.LEAGUE,
-        "version_type": types.VersionType.V1,
-        "region": platform_and_region.Region.ASIA,
-        "platform": platform_and_region.Platform.KR,
-        "start": 0,
+    search_overrides = {
         "start_time": int(datetime.datetime.fromisoformat(FLAGS.start_date).timestamp()),
         "end_time": int(datetime.datetime.fromisoformat(FLAGS.end_date).timestamp()),
         "count": FLAGS.count,
     }
+    default_search_config = search.SearchConfig.load_default_config(**search_overrides)
 
     # 0. Log some info
     logger.info(
@@ -65,7 +60,7 @@ def main(_):
 
     # 2. Get challenger-tier league entries.
     tier_entries = riot_api_client.get_league_entries_by_tier(
-        tier=FLAGS.tier, division=FLAGS.division, **default_search_config
+        tier=FLAGS.tier, division=FLAGS.division, **default_search_config.as_dict()
     )
 
     # 3. Collect summoner ids of active users
@@ -76,16 +71,18 @@ def main(_):
 
     # 4. Get summoner data by summoner ids
     logger.info(f"Getting number of {len(summoner_ids)} summoner data...")
-    summoner_data = riot_api_client.get_summoner_data_by_summoner_ids(summoner_ids, **default_search_config)
+    summoner_data = riot_api_client.get_summoner_data_by_summoner_ids(
+        summoner_ids[:2], **default_search_config.as_dict()
+    )
 
     # 5. Collect puuids from summoner data
     puuids = [d.puuid for d in summoner_data]
 
     # 6. Get Match Ids by puuids.
-    match_ids = riot_api_client.get_match_ids_by_puuids(puuids, **default_search_config)
+    match_ids = riot_api_client.get_match_ids_by_puuids(puuids, **default_search_config.as_dict())
 
     # 7. Get Match Datas by match ids
-    match_data = riot_api_client.get_match_data_by_match_ids(match_ids[0], **default_search_config)
+    match_data = riot_api_client.get_match_data_by_match_ids(match_ids[0], **default_search_config.as_dict())
 
     logger.info(
         f"""
