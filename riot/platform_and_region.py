@@ -1,8 +1,7 @@
-import dataclasses
+import enum
 
 
-@dataclasses.dataclass(frozen=True)
-class Platform:
+class Platform(enum.StrEnum):
     BR1 = "br1"
     EUN1 = "eun1"
     EUW1 = "euw1"
@@ -21,8 +20,7 @@ class Platform:
     VN2 = "vn2"
 
 
-@dataclasses.dataclass(frozen=True)
-class Region:
+class Region(enum.StrEnum):
     AMERICAS = "americas"
     ASIA = "asia"
     EUROPE = "europe"
