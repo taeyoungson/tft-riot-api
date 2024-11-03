@@ -6,9 +6,9 @@ from requests.exceptions import HTTPError
 import requests_ratelimiter
 import tqdm
 
-from riot import errors
-from riot import objects
-from riot import platform_and_region
+from riot.utils import errors
+from riot.utils import objects
+from riot.utils import platform_and_region
 from riot.utils import types
 
 _DEFAULT_REQUEST_TIMEOUT = 30

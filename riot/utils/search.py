@@ -4,7 +4,7 @@ import datetime
 
 import pydantic
 
-from riot import platform_and_region
+from riot.utils import platform_and_region
 from riot.utils import types
 
 
