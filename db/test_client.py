@@ -51,7 +51,7 @@ class PostgresDBClientTests(absltest.TestCase):
 
     def test_insert(self):
         db = client.PostgreSQLClient(
-            dbname=os.getenv("DB_NAME"),
+            dbname="tftdb",
             user=os.getenv("DB_USER"),
             password=os.getenv("DB_PASSWORD"),
             host=os.getenv("DB_HOST"),
