@@ -6,8 +6,8 @@ from absl.testing import parameterized
 import dotenv
 
 from riot import client
-from riot import objects
-from riot import platform_and_region
+from riot.utils import objects
+from riot.utils import platform_and_region
 from riot.utils import types
 
 
