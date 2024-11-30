@@ -8,11 +8,9 @@ python example.py \
 """
 
 import datetime
-import os
 
 from absl import app
 from absl import flags
-import dotenv
 from loguru import logger
 import tqdm
 
@@ -40,8 +38,6 @@ FLAGS = flags.FLAGS
 
 
 def main(_):
-    dotenv.load_dotenv("./riot/.env")
-
     search_overrides = {
         "start_time": int(datetime.datetime.fromisoformat(FLAGS.start_date).timestamp()),
         "end_time": int(datetime.datetime.fromisoformat(FLAGS.end_date).timestamp()),
@@ -56,7 +52,7 @@ def main(_):
     )
 
     # 1. Initialize client
-    riot_api_client = client.RiotApiClient(api_key=os.getenv("RIOT_API_KEY"))
+    riot_api_client = client.RiotApiClient()
 
     # 2. Get challenger-tier league entries.
     tier_entries = riot_api_client.get_league_entries_by_tier(

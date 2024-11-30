@@ -11,7 +11,7 @@ from riot.utils import types
 @pytest.fixture(name="riot_client")
 def setup_client() -> client.RiotApiClient:
     """Fixture to set up client instance and test configuration."""
-    return client.RiotApiClient(api_key="this-is-a-api-key")
+    return client.RiotApiClient()
 
 
 @pytest.fixture(name="test_config")

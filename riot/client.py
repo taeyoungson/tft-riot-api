@@ -6,6 +6,7 @@ from requests.exceptions import HTTPError
 import requests_ratelimiter
 import tqdm
 
+from riot import settings
 from riot.utils import dto
 from riot.utils import errors
 from riot.utils import platform_and_region
@@ -17,16 +18,15 @@ _RATE_LIMIT_PER_MINUTE = 45
 
 
 class RiotApiClient:
-    def __init__(self, api_key: str):
-        self._api_key = api_key
+    _api_base = "https://{platform_or_region}.api.riotgames.com"
+
+    def __init__(self):
+        self._settings = settings.load_settings()
+        self._api_key = self._settings.api_key
         self._session = requests_ratelimiter.LimiterSession(
             per_second=_RATE_LIMIT_PER_SECOND,
             per_minute=_RATE_LIMIT_PER_MINUTE,
         )
-
-    @property
-    def _api_base(self) -> str:
-        return "https://{platform_or_region}.api.riotgames.com"
 
     @property
     def _headers(self) -> dict[str, str]:
