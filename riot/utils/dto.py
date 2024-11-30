@@ -3,14 +3,14 @@ from __future__ import annotations
 import pydantic
 
 
-class MiniSeriesDTO(pydantic.BaseModel):
+class MiniSeriesDto(pydantic.BaseModel):
     losses: int
     progress: str
     target: int
     wins: int
 
     @classmethod
-    def from_dict(cls, d: dict[str, str]) -> MiniSeriesDTO:
+    def from_dict(cls, d: dict[str, str]) -> MiniSeriesDto:
         return cls(
             losses=int(d["losses"]),
             progress=d["progress"],
@@ -19,7 +19,7 @@ class MiniSeriesDTO(pydantic.BaseModel):
         )
 
 
-class LeagueEntryDTO(pydantic.BaseModel):
+class LeagueEntryDto(pydantic.BaseModel):
     puuid: str
     league_id: str
     summoner_id: str
@@ -33,10 +33,10 @@ class LeagueEntryDTO(pydantic.BaseModel):
     veteran: bool
     fresh_blood: bool
     inactive: bool
-    mini_series: list[MiniSeriesDTO]
+    mini_series: list[MiniSeriesDto]
 
     @classmethod
-    def from_dict(cls, d: dict[str, str]) -> LeagueEntryDTO:
+    def from_dict(cls, d: dict[str, str]) -> LeagueEntryDto:
         return cls(
             puuid=d["puuid"],
             league_id=d["leagueId"],
@@ -51,7 +51,7 @@ class LeagueEntryDTO(pydantic.BaseModel):
             veteran=bool(d["veteran"]),
             fresh_blood=bool(d["freshBlood"]),
             inactive=bool(d["inactive"]),
-            mini_series=[MiniSeriesDTO.from_dict(m_s) for m_s in d.get("miniSeries", [])],
+            mini_series=[MiniSeriesDto.from_dict(m_s) for m_s in d.get("miniSeries", [])],
         )
 
     def __repr__(self):
@@ -73,10 +73,10 @@ class LeagueEntryDTO(pydantic.BaseModel):
         """
 
 
-class LeagueItemDTO(pydantic.BaseModel):
+class LeagueItemDto(pydantic.BaseModel):
     fresh_blood: bool
     wins: int
-    mini_series: list[MiniSeriesDTO]
+    mini_series: list[MiniSeriesDto]
     inactive: bool
     veteran: bool
     hot_streak: bool
@@ -86,11 +86,11 @@ class LeagueItemDTO(pydantic.BaseModel):
     summoner_id: str
 
     @classmethod
-    def from_dict(cls, d: dict[str, str]) -> LeagueItemDTO:
+    def from_dict(cls, d: dict[str, str]) -> LeagueItemDto:
         return cls(
             fresh_blood=bool(d["freshBlood"]),
             wins=int(d["wins"]),
-            mini_series=[MiniSeriesDTO.from_dict(m_s) for m_s in d.get("miniSeries", [])],
+            mini_series=[MiniSeriesDto.from_dict(m_s) for m_s in d.get("miniSeries", [])],
             inactive=bool(d["inactive"]),
             veteran=bool(d["veteran"]),
             hot_streak=bool(d["hotStreak"]),
@@ -115,18 +115,18 @@ class LeagueItemDTO(pydantic.BaseModel):
         """
 
 
-class LeagueListDTO(pydantic.BaseModel):
+class LeagueListDto(pydantic.BaseModel):
     league_id: str
-    entries: list[LeagueItemDTO]
+    entries: list[LeagueItemDto]
     tier: str
     name: str
     queue: str
 
     @classmethod
-    def from_dict(cls, d: dict[str, str]) -> LeagueListDTO:
+    def from_dict(cls, d: dict[str, str]) -> LeagueListDto:
         return cls(
             league_id=d["leagueId"],
-            entries=[LeagueItemDTO.from_dict(entry) for entry in d["entries"]],
+            entries=[LeagueItemDto.from_dict(entry) for entry in d["entries"]],
             tier=d["tier"],
             name=d["name"],
             queue=d["queue"],
@@ -142,13 +142,13 @@ class LeagueListDTO(pydantic.BaseModel):
         """
 
 
-class MetadataDTO(pydantic.BaseModel):
+class MetadataDto(pydantic.BaseModel):
     data_version: str
     match_id: str
     participants_puuids: list[str]
 
     @classmethod
-    def from_dict(cls, d: dict[str, str | list[str]]) -> MetadataDTO:
+    def from_dict(cls, d: dict[str, str | list[str]]) -> MetadataDto:
         return cls(
             data_version=d["data_version"],
             match_id=d["match_id"],
@@ -156,7 +156,7 @@ class MetadataDTO(pydantic.BaseModel):
         )
 
 
-class TraitDTO(pydantic.BaseModel):
+class TraitDto(pydantic.BaseModel):
     name: str
     num_units: int
     style: int
@@ -164,7 +164,7 @@ class TraitDTO(pydantic.BaseModel):
     tier_total: int
 
     @classmethod
-    def from_dict(cls, d: dict[str, str]) -> TraitDTO:
+    def from_dict(cls, d: dict[str, str]) -> TraitDto:
         return cls(
             name=d["name"],
             num_units=int(d["num_units"]),
@@ -174,7 +174,7 @@ class TraitDTO(pydantic.BaseModel):
         )
 
 
-class UnitDTO(pydantic.BaseModel):
+class UnitDto(pydantic.BaseModel):
     items: list[int]
     item_names: list[str]
     character_id: str
@@ -184,7 +184,7 @@ class UnitDTO(pydantic.BaseModel):
     tier: int
 
     @classmethod
-    def from_dict(cls, d: dict[str, str, list]) -> UnitDTO:
+    def from_dict(cls, d: dict[str, str, list]) -> UnitDto:
         return cls(
             items=d.get("items", []),
             item_names=d["itemNames"],
@@ -196,7 +196,7 @@ class UnitDTO(pydantic.BaseModel):
         )
 
 
-class ParticipantDTO(pydantic.BaseModel):
+class ParticipantDto(pydantic.BaseModel):
     augments: list[str]
     gold_left: int
     last_round: int
@@ -208,13 +208,13 @@ class ParticipantDTO(pydantic.BaseModel):
     riot_id_tag_line: str | None
     time_eliminated: float
     total_damage_to_players: int
-    traits: list[TraitDTO]
-    units: list[UnitDTO]
+    traits: list[TraitDto]
+    units: list[UnitDto]
 
     @classmethod
-    def from_dict(cls, d: dict[str, str | dict | list]) -> ParticipantDTO:
+    def from_dict(cls, d: dict[str, str | dict | list]) -> ParticipantDto:
         return cls(
-            augments=d["augments"],
+            augments=d.get("augments", []),
             gold_left=int(d["gold_left"]),
             last_round=int(d["last_round"]),
             level=int(d["level"]),
@@ -225,40 +225,40 @@ class ParticipantDTO(pydantic.BaseModel):
             riot_id_tag_line=d.get("riotIdTagline", None),
             time_eliminated=float(d["time_eliminated"]),
             total_damage_to_players=int(d["total_damage_to_players"]),
-            traits=[TraitDTO.from_dict(t) for t in d["traits"]],
-            units=[UnitDTO.from_dict(u) for u in d["units"]],
+            traits=[TraitDto.from_dict(t) for t in d["traits"]],
+            units=[UnitDto.from_dict(u) for u in d["units"]],
         )
 
 
-class InfoDTO(pydantic.BaseModel):
+class InfoDto(pydantic.BaseModel):
     game_datetime: float
     game_length: float
     game_version: str
     game_variation: str | None
-    participants: list[ParticipantDTO]
+    participants: list[ParticipantDto]
     queue_id: int
     tft_set_number: int
 
     @classmethod
-    def from_dict(cls, d: dict[str, str | dict]) -> InfoDTO:
+    def from_dict(cls, d: dict[str, str | dict]) -> InfoDto:
         return cls(
             game_datetime=float(d["game_datetime"]),
             game_length=float(d["game_length"]),
             game_variation=d.get("game_variation", None),
             game_version=d["game_version"],
-            participants=[ParticipantDTO.from_dict(p) for p in d["participants"]],
+            participants=[ParticipantDto.from_dict(p) for p in d["participants"]],
             queue_id=int(d["queue_id"]),
             tft_set_number=int(d["tft_set_number"]),
         )
 
 
-class MatchDTO(pydantic.BaseModel):
-    metadata: MetadataDTO
-    info: InfoDTO
+class MatchDto(pydantic.BaseModel):
+    metadata: MetadataDto
+    info: InfoDto
 
     @classmethod
-    def from_dict(cls, d: dict[str, str | dict]) -> MatchDTO:
+    def from_dict(cls, d: dict[str, str | dict]) -> MatchDto:
         return cls(
-            metadata=MetadataDTO.from_dict(d["metadata"]),
-            info=InfoDTO.from_dict(d["info"]),
+            metadata=MetadataDto.from_dict(d["metadata"]),
+            info=InfoDto.from_dict(d["info"]),
         )
