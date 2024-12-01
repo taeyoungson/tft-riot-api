@@ -45,7 +45,7 @@ class PostgresDB:
             logger.error(f"Query execution failed with error {e}")
             self.conn.rollback()
 
-    def fetch_all(self, query, params=None):
+    def fetch_all(self, query: str, params: tuple[str, ...] | None = None):
         try:
             if params:
                 self.cursor.execute(query, params)
