@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import datetime
+
 import pydantic
 
 
@@ -262,3 +264,29 @@ class MatchDto(pydantic.BaseModel):
             metadata=MetadataDto.from_dict(d["metadata"]),
             info=InfoDto.from_dict(d["info"]),
         )
+
+    def as_lists_of_dict(self) -> list[dict[str, str]]:
+        participants = self.info.participants
+
+        data = []
+        for p in participants:
+            data.append(
+                {
+                    "match_id": self.metadata.match_id,
+                    "puuid": p.puuid,
+                    "riot_id_game_name": p.riot_id_game_name,
+                    "match_time": datetime.datetime.fromtimestamp(self.info.game_datetime / 1e3).strftime(
+                        "%Y-%m-%d %H:%M:%S"
+                    ),
+                    "units_dict": {u.character_id: u.tier for u in p.units},
+                    "last_round": p.last_round,
+                    "level": p.level,
+                    "placement": p.placement,
+                    "players_eliminated": int(p.players_eliminated),
+                    "time_eliminated": int(p.time_eliminated),
+                    "total_damage_to_players": int(p.total_damage_to_players),
+                    "traits_dict": {t.name: t.num_units for t in p.traits},
+                    "gold_left": p.gold_left,
+                }
+            )
+        return data
